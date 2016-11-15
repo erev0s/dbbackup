@@ -9,7 +9,6 @@ TOKEN=""
 USERID=""
 MAIL=""
 
-
 # if the directory does not exist, make it please
 if [ ! -d $path ]; then
   mkdir -p $path
@@ -18,13 +17,8 @@ else
 fi
 
 
-#method to remove old database backups
-find $DELPATH* -mtime +5 -exec rm {} \;
-
-
 DBS="$(mysql -u$USER -p$PASSWORD -Bse 'show databases')"
 echo "$DBS"
-
 
 
 #if your db starts with an _ then ignore it this way you can create dbs with _ if you want them ignored
@@ -36,12 +30,11 @@ for db in $DBS; do
 				exitcode=$?
         gzip $path/`date +%Y%m%d`.$db.sql
 		FILESIZE=$(stat -c%s "$path/`date +%Y%m%d`.$db.sql.gz")
-		printf "$db Backed up with EXITCODE [ $exitcode ] and with size $FILESIZE bytes\n";
-		
-		#create an if to notify us in case of bad mysqldump
-		if [ $exitcode -ne 0 ]; then
-		curl -s \
-		-F "token=$TOKEN" \
+		printf "$db Backed up with EXITCODE [ $exitcode ] and with size $FILESIZE bytes\n";	
+	#create an if to notify us in case of bad mysqldump
+	if [ $exitcode -ne 0 ]; then
+	curl -s \
+	-F "token=$TOKEN" \
         -F "user=$USERID" \
         -F "message=$db ERROR BACKING UP === errorcode = $exitcode   " \
         -F "priority=1"\
@@ -55,6 +48,12 @@ for db in $DBS; do
 	fi
 done
 
+
+#method to remove old database backups
+find $DELPATH* -mtime +5 -exec rm {} \;
+
+
+
 #notify me of all the results
         curl -s \
         -F "token=$TOKEN" \
@@ -64,4 +63,10 @@ done
         https://api.pushover.net/1/messages.json
 		
 #by mail too
-echo "$(cat $STATUS)" | mail -s "Database Backup Results" $MAIL		
+echo "$(cat $STATUS)" | mail -s "Database Backup Results" $MAIL	
+
+
+
+
+
+
