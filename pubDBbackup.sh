@@ -9,6 +9,7 @@ TOKEN=""
 USERID=""
 MAIL=""
 
+
 # if the directory does not exist, make it please
 if [ ! -d $path ]; then
   mkdir -p $path
@@ -53,19 +54,19 @@ done
 find $DELPATH* -mtime +5 -exec rm {} \;
 
 
+else
+	printf "\nFiles older than 5 days have been deleted\n" >> $STATUS
 
 #notify me of all the results
         curl -s \
         -F "token=$TOKEN" \
         -F "user=$USERID" \
-        -F "message=$(cat $STATUS)" \
+        -F "message=server is $(hostname) $(cat $STATUS)" \
         -F "priority=0"\
         https://api.pushover.net/1/messages.json
 		
 #by mail too
 echo "$(cat $STATUS)" | mail -s "Database Backup Results" $MAIL	
-
-
 
 
 
