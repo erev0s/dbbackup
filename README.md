@@ -14,8 +14,6 @@ I have included a check on mysqldump so you would know if the process ended with
     it emails the results to you, and send them through pushover too
 
 
-##################################
+
 ###########-to do list-###########
-##################################
-move the delete till after verifying that the backup went well
 add a list of databases to be ignored
